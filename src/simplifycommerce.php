@@ -272,7 +272,6 @@ class plgVmPaymentSimplifyCommerce extends vmPSPlugin
 		    </div>
 		    <div class="simplify-processing frm-grp">Validating your credit card... <i class="fa fa-refresh fa-spin"></i></div>
 		</div>
-		<div>API Key = '.$publicKey.'</div>
 		<div id="error-container"></div>';
 
 				$htmla[] = $html;
