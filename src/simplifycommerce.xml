@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<install version="1.5" type="plugin" group="vmpayment" method="upgrade">
-    <name>Simplify Commerce</name>
-    <creationDate>31 October 2013</creationDate>
+<extension version="2.5" type="plugin" group="vmpayment" method="upgrade">
+    <name>VMPAYMENT_SIMPLIFY_COMMERCE</name>
+    <creationDate>1 February 2017</creationDate>
     <author>MasterCard</author>
     <authorUrl>http://www.simplify.com</authorUrl>
-    <copyright>Copyright (C) 2013.</copyright>
+    <copyright>Copyright (C) 2017.</copyright>
     <license></license>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <description>
         <![CDATA[
             <div>
-                <h3>Simplify Commerce Virtuemart Plugin 1.0.0</h3>
+                <h3>Simplify Commerce Virtuemart Plugin 2.0.0</h3>
                 <p>To enable payments with Simplify Commerce on the Administrator screen:<p/>
                 <ul>
                     <li>Select 'VirtueMart' from the 'Components' menu</li>
@@ -22,39 +22,42 @@
             </div>
         ]]>
     </description>
-    <scriptfile>install.simplifycommerce.php</scriptfile>
     <files>
         <filename plugin="simplifycommerce">simplifycommerce.php</filename>
-        <filename>lib/Simplify.php</filename>
-        <filename>lib/Simplify/AccessToken.php</filename>
-        <filename>lib/Simplify/Authentication.php</filename>
-        <filename>lib/Simplify/CardToken.php</filename>
-        <filename>lib/Simplify/Chargeback.php</filename>
-        <filename>lib/Simplify/Constants.php</filename>
-        <filename>lib/Simplify/Coupon.php</filename>
-        <filename>lib/Simplify/Customer.php</filename>
-        <filename>lib/Simplify/Deposit.php</filename>
-        <filename>lib/Simplify/Event.php</filename>
-        <filename>lib/Simplify/Exceptions.php</filename>
-        <filename>lib/Simplify/Http.php</filename>
-        <filename>lib/Simplify/Invoice.php</filename>
-        <filename>lib/Simplify/InvoiceItem.php</filename>
-        <filename>lib/Simplify/Object.php</filename>
-        <filename>lib/Simplify/Payment.php</filename>
-        <filename>lib/Simplify/PaymentsApi.php</filename>
-        <filename>lib/Simplify/Plan.php</filename>
-        <filename>lib/Simplify/Refund.php</filename>
-        <filename>lib/Simplify/ResourceList.php</filename>
-        <filename>lib/Simplify/Subscription.php</filename>
-        <filename>lib/Simplify/Webhook.php</filename>
+        <folder>lib</folder>
+        <folder>assets</folder>
     </files>
-    <params addpath="/administrator/components/com_virtuemart/elements">
-        <param type="vmjpluginwarning" />
-        <param type="spacer" default="&lt;h2&gt;Simplify Commerce&lt;/h2&gt;" level="level1"/>
-        <param type="spacer" default="If you have not done so already, you can &lt;a href='https://www.simplify.com/commerce/login/signup' target='_blank'&gt;register with Simplify Commerce&lt;/a&gt;." level="level1"/>
-        <param type="spacer" default="" level="level1"/>
-        <param type="spacer" default="Please enter your Simplify Commerce API Keys:" level="level1" />
-        <param name="publicKey" type="text" size="80" default="" label="Public Key" description="Simplify Commerce Public Key" />
-        <param name="privateKey" type="text" size="80" default="" label="Private Key" description="Simplify Commerce Private Key" />
-    </params>
-</install>
+    <languages>
+        <language tag="en-GB">en-GB.plg_vmpayment_simplifycommerce.ini</language>
+        <language tag="en-GB">en-GB.plg_vmpayment_simplifycommerce.sys.ini</language>
+    </languages>
+
+
+    <vmconfig>
+        <fields name="params">
+            <fieldset name="payment" addfieldpath="/plugins/vmpayment/simplifycommerce/simplifycommerce/fields">
+                <field type="note" label="" />
+                <field type="spacer" default="VMPAYMENT_SIMPLIFY_COMMERCE_PAYMENT_TITLE" level="level1" />
+                <field type="spacer" default="" level="level1" />
+                <field type="spacer" default="VMPAYMENT_SIMPLIFY_COMMERCE_PARAMS" level="level1" />
+                <field type="vmtitle" default="VMPAYMENT_SIMPLIFY_COMMERCE_SETTING" level="level1"/>
+                <field name="simplify_commerce_payment_type" type="radio" default="0" label="VMPAYMENT_SIMPLIFY_COMMERCE_PAYMENT_TYPE" class="btn btn-group" description="VMPAYMENT_SIMPLIFY_COMMERCE_PAYMENT_TYPE_DESC">
+                    <option value="0">VMPAYMENT_SIMPLIFY_COMMERCE_PAYMENT_SANDBOX</option>
+                    <option value="1">VMPAYMENT_SIMPLIFY_COMMERCE_PAYMENT_LIVE</option>
+                </field>
+
+                <field type="text" name="simplify_commerce_sandbox_private_key"  size="50" label="VMPAYMENT_SIMPLIFY_COMMERCE_SANDBOX_PRIVATE_KEY"
+                       default="" description="SIMPLIFY_COMMERCE_SANDBOX_PRIVATE_KEY_DESC" />
+                <field type="text" name="simplify_commerce_sandbox_public_key"  size="50" label="VMPAYMENT_SIMPLIFY_COMMERCE_SANDBOX_PUBLIC_KEY"
+                       default="" description="VMPAYMENT_SIMPLIFY_COMMERCE_SANDBOX_PUBLIC_KEY_DESC" />
+
+                <field type="text" name="simplify_commerce_live_private_key"  size="50" label="VMPAYMENT_SIMPLIFY_COMMERCE_LIVE_PRIVATE_KEY"
+                       default="" description="VMPAYMENT_SIMPLIFY_COMMERCE_LIVE_PRIVATE_KEY_DESC" />
+                <field type="text" name="simplify_commerce_live_public_key"  size="50" label="VMPAYMENT_SIMPLIFY_COMMERCE_LIVE_PUBLIC_KEY"
+                       default="" description="VMPAYMENT_SIMPLIFY_COMMERCE_LIVE_PUBLIC_KEY_DESC" />
+
+                <field name="log" type="hidden" />
+            </fieldset>
+        </fields>
+    </vmconfig>
+</extension>
