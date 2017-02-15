@@ -1,16 +1,9 @@
-
-
-jQuery(document).ready(function( $ ) {
+jQuery(document).ready(function ($) {
 
     var checkoutForm = jQuery('#checkoutForm');
 
     function simplifyResponseHandler(data) {
 
-        console.log("###### simplifyResponseHandler data = ", data);
-
-        alert("Token Generated ");
-
-        var simplifyPaymentForm = jQuery("#checkoutForm");
         jQuery('#sys-error-container').remove();
 
         // Check for errors
@@ -40,36 +33,45 @@ jQuery(document).ready(function( $ ) {
         } else {
             // The token contains id, last4, and card type
             var token = data["id"];
+
+            console.log("Simplify Card Token = ", token);
             // Insert the token into the form so it gets submitted to the server
-            simplifyPaymentForm.append("<input type='hidden' name='simplifyToken' value='" + token + "' />");
+            jQuery('#checkoutForm').append("<input type='hidden' id='simplifyToken' name='simplifyToken' value='" + token + "' />");
             // Submit the form to the server
-            simplifyPaymentForm.get(0).submit();
+            jQuery('#checkoutForm').submit();
         }
     }
 
-    checkoutForm.on("submit", function() {
+    checkoutForm.on("submit", function (e) {
 
-        alert("Submitting form")
-
-        if(jQuery('input[type=radio]:checked').parent().find('span.vmpayment_name').html() === 'Simplify Commerce'){
-
-            jQuery(this).vm2front("startVmLoading");
-
-            // Generate a card token & handle the response
-            SimplifyCommerce.generateToken({
-                key: jQuery(document).data('simplify_commerce_public_key'),
-                card: {
-                    number: jQuery("#cc-number").val(),
-                    cvc: jQuery("#cc-cvc").val(),
-                    expMonth: jQuery("#cc-exp-month").val(),
-                    expYear: jQuery("#cc-exp-year").val()
-                }
-            }, simplifyResponseHandler);
-            // Prevent the form from submitting
-            return false;
+        if (jQuery('#simplifyToken').val()) {
+            //if we are submitting using the token, just move on
+            console.log("Simplify Card Token available");
+            return true;
         }
+        else if (jQuery('input[type=radio]:checked').parent().find('span.vmpayment_name').html() === 'Simplify Commerce') {
 
-        console.log("Submitting form");
+            var ccNumber = jQuery("#cc-number").val();
+            var expMonth = jQuery("#cc-exp-month").val();
+            var expYear = jQuery("#cc-exp-year").val();
+
+            if (ccNumber && expMonth && expYear) {
+
+                jQuery(this).vm2front("startVmLoading");
+
+                // Generate a card token & handle the response
+                SimplifyCommerce.generateToken({
+                    key: jQuery(document).data('simplify_commerce_public_key'),
+                    card: {
+                        number: ccNumber,
+                        cvc: jQuery("#cc-cvc").val(),
+                        expMonth: expMonth,
+                        expYear: expYear
+                    }
+                }, simplifyResponseHandler);
+                // Prevent the form from submitting
+                return false;
+            }
+        }
     });
-    console.log("##### Loading DONE!");
 });
