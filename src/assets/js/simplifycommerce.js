@@ -1,77 +1,85 @@
-jQuery(document).ready(function ($) {
+window.SimplifyPlugin = (function () {
+    var _ignore = false;
+    var _active = false;
+    var _$btn;
+    var _$form;
+    var _params = {
+        'sc-key': "YOUR_HOSTED_PAYMENTS_ENABLED_PUBLIC_KEY",
+        name: "NAME",
+        description: "Order total",
+        reference: "REFERENCE",
+        amount: "1",
+        currency: "USD",
+        operation: 'create.token',
+        'redirect-url': window.location
+    };
 
-    var checkoutForm = jQuery('#checkoutForm');
+    var _setActive = function (active) {
+        _active = active;
+        if (active) {
+            _$form = jQuery('#checkoutForm');
+            _$form.submit(_submitHandler);
+        }
+    };
 
-    function simplifyResponseHandler(data) {
+    var _setValue = function (key, value) {
+        _params[key] = value;
+        _$btn.attr('data-' + key, value);
+    };
 
-        jQuery('#sys-error-container').remove();
-
-        // Check for errors
-        if (data.error) {
-            var errorMessages = {
-                'card.number': 'The credit card number you entered is invalid.',
-                'card.expYear': 'The expiry year on the credit card is invalid.'
-            };
-
-            // Show any validation errors
-            if (data.error.code == "validation") {
-                var fieldErrors = data.error.fieldErrors,
-                    fieldErrorsLength = fieldErrors.length,
-                    errorList = "";
-                for (var i = 0; i < fieldErrorsLength; i++) {
-                    errorList += "<div class='error'>" + errorMessages[fieldErrors[i].field] +
-                        " " + fieldErrors[i].message + ".</div>";
+    var _submitHandler = function (e) {
+        if (_ignore) {
+            _ignore = false;
+        } else if (_active) {
+            e.preventDefault();
+            //the check needs to be asynchronous so the internal jquery code changes the btn.
+            //couldn't use the click handler because it's probably prevented by a previous handler.
+            window.setTimeout(function () {
+                if (_$form.find('#checkoutFormSubmit').prop('disabled') && _$form.find('#tos').prop('checked')) {
+                    SimplifyCommerce.hostedPayments();
+                    _$btn.click();
+                } else {
+                    _ignore = true;
+                    _$form.submit();
                 }
-                // Display the errors
-                jQuery('#error-container').html(errorList);
-            } else {
-                jQuery('#error-container').html('<div>' + data.error.message + '</div>');
+            }, 1);
+            return false;
+        }
+    };
+
+    var _parseSearchQuery = function () {
+        var params = {};
+
+        window.location.search.substring(1).split('&').forEach(function (param) {
+            var parts = param.split('=');
+            if (parts.length > 1) {
+                params[parts[0]] = parts[1];
             }
-            // Re-enable the submit button
-            jQuery("#process-payment-btn").removeAttr("disabled");
-            jQuery('.simplify-processing').hide();
+        });
+
+        return params;
+    };
+
+    var _init = function () {
+        var searchParams = _parseSearchQuery();
+        if (searchParams.cardToken) {
+            var form = jQuery('#checkoutForm');
+            form.attr('action', form.attr('action') + '?cardToken=' + searchParams.cardToken);
+            form.find('#checkoutFormSubmit').click();
         } else {
-            // The token contains id, last4, and card type
-            var token = data["id"];
-
-            console.log("Simplify Card Token = ", token);
-            // Insert the token into the form so it gets submitted to the server
-            jQuery('#checkoutForm').append("<input type='hidden' id='simplifyToken' name='simplifyToken' value='" + token + "' />");
-            // Submit the form to the server
-            jQuery('#checkoutForm').submit();
-        }
-    }
-
-    checkoutForm.on("submit", function (e) {
-
-        if (jQuery('#simplifyToken').val()) {
-            //if we are submitting using the token, just move on
-            console.log("Simplify Card Token available");
-            return true;
-        }
-        else if (jQuery('input[type=radio]:checked').parent().find('span.vmpayment_name').html() === 'Simplify Commerce') {
-
-            var ccNumber = jQuery("#cc-number").val();
-            var expMonth = jQuery("#cc-exp-month").val();
-            var expYear = jQuery("#cc-exp-year").val();
-
-            if (ccNumber && expMonth && expYear) {
-
-                jQuery(this).vm2front("startVmLoading");
-
-                // Generate a card token & handle the response
-                SimplifyCommerce.generateToken({
-                    key: jQuery(document).data('simplify_commerce_public_key'),
-                    card: {
-                        number: ccNumber,
-                        cvc: jQuery("#cc-cvc").val(),
-                        expMonth: expMonth,
-                        expYear: expYear
-                    }
-                }, simplifyResponseHandler);
-                // Prevent the form from submitting
-                return false;
+            _$btn = jQuery('<button style="display: none;">Buy Now</button>');
+            jQuery(document.body).append(_$btn);
+            for (var key in _params) {
+                if (_params.hasOwnProperty(key)) {
+                    _setValue(key, _params[key]);
+                }
             }
         }
-    });
-});
+    };
+    _init();
+
+    return {
+        setActive: _setActive,
+        setValue: _setValue
+    }
+})();
