@@ -7,6 +7,8 @@ Ref: https://www.simplify.com/commerce/
 
 Ref: http://virtuemart.net/
 
+See the full distributable installation guide with detailed instructions on our [support page](https://simplify.desk.com/customer/en/portal/articles/2759392-joomla---virtuemart-installation-guide)
+
 ## Installation
 1/ If you haven't done so already, download a release (simplifycommerce.zip) from the menu option above and install the zip file through the Joomla admin panel.
 
